@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QGraphicsRectItem>
+#include <QStateMachine>
 
 class Switch : public QObject, public QGraphicsRectItem
 {
@@ -14,6 +15,14 @@ public:
 
 signals:
     void clicked();
+
+    void on();
+    void off();
+
+public slots:
+    void fill();
+    void clear();
+
 private:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
@@ -26,6 +35,8 @@ private:
         QPointF diff() const { return to - from;}
     };
     Moving moving;
+    QStateMachine *fsm;
+    bool full = false;
 };
 
 #endif // SWITCH_H
