@@ -16,26 +16,30 @@ int main()
   try
   {
     boost::asio::io_service io_service;
-
     tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 4000));
 
-    for (;;)
-    {
-      auto socket = std::make_unique<tcp::socket>(io_service);
-      acceptor.accept(*socket);
+    const std::function<void()> spawn = [&]{
+        // note: no unique_ptr... http://stackoverflow.com/questions/37709819/why-must-a-boost-asio-handler-be-copy-constructible
+        auto socket = std::make_shared<tcp::socket>(io_service);
+        acceptor.accept(*socket);
 
-      //io_service.post([socket{std::move(socket)}]{
-          std::string message = make_daytime_string();
+        io_service.post([=]{
+            std::string message = make_daytime_string();
 
-          boost::system::error_code ignored_error;
-          boost::asio::write(*socket, boost::asio::buffer(message), ignored_error);
-      //});
+            boost::system::error_code ignored_error;
+            boost::asio::write(*socket, boost::asio::buffer(message), ignored_error);
+        });
+        io_service.post(spawn);
+    };
 
-    }
+    io_service.post(spawn);
+
+    io_service.run();
   }
   catch (std::exception& e)
   {
     std::cerr << e.what() << std::endl;
+    return 1;
   }
 
   return 0;
