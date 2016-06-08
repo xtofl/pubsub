@@ -2,11 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QGraphicsScene>
+#include <QVector>
 
 namespace Ui {
 class MainWindow;
 }
-
+class Switch;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -17,6 +19,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QGraphicsScene scene;
+    QVector<Switch *> switches;
 };
 
 #endif // MAINWINDOW_H
