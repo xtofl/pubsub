@@ -24,9 +24,16 @@ int main()
         acceptor.accept(*socket);
 
         io_service.post([=]{
+            boost::asio::streambuf b;
+            boost::asio::read_until(*socket, b, '\n');
+            std::istream i(&b);
+            std::string command;
+            i >> command;
+
             std::string message = make_daytime_string();
 
             boost::system::error_code ignored_error;
+            boost::asio::write(*socket, boost::asio::buffer(command), ignored_error);
             boost::asio::write(*socket, boost::asio::buffer(message), ignored_error);
         });
         io_service.post(spawn);
